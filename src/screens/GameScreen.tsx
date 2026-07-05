@@ -425,7 +425,6 @@ export function GameScreen({ settings, onOpenSettings, onOpenInstructions }: Gam
           busy={solver.busy}
           colors={settings.colors}
           hasGuesses={history.length > 0}
-          history={history}
         />
       )}
 

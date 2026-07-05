@@ -1,7 +1,7 @@
 {
   "name": "super-mastermind",
   "productName": "Super Mastermind",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "משחק בול פגיעה (Mastermind) מלא בעברית - אפליקציית Desktop",
   "private": true,
   "main": "dist-electron/main.js",

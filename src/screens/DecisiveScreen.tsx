@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { AnalysisResult, AppSettings, ColorId, DecisiveDifficulty, Hint, Puzzle } from '../types';
 import { useSolverWorker } from '../hooks/useSolverWorker';
 import { isCandidateConsistent } from '../solver/analyze';
@@ -201,13 +201,13 @@ export function DecisiveScreen({ settings }: DecisiveScreenProps) {
 
         {puzzle && !loading && (
           <>
-            <div className="board">
+            <div className="board" style={{ '--code-length': puzzle.rules.codeLength } as CSSProperties}>
               {puzzle.history.map((record, index) => (
                 <div key={index} className="board__row">
                   <span className="board__index">{index + 1}</span>
                   <div className="board__pegs">
                     {record.guess.map((id, i) => (
-                      <ColorPeg key={i} color={colorOf(id)} size="md" showSymbol={settings.display.showSymbols} />
+                      <ColorPeg key={i} color={colorOf(id)} size="lg" showSymbol={settings.display.showSymbols} />
                     ))}
                   </div>
                   <ScorePegs score={record.score} codeLength={puzzle.rules.codeLength} />
@@ -286,7 +286,7 @@ export function DecisiveScreen({ settings }: DecisiveScreenProps) {
       </section>
 
       {showAnalysis && puzzle && (
-        <AnalysisPanel analysis={analysis} busy={solver.busy} colors={puzzleColors} hasGuesses history={puzzle?.history ?? []} />
+        <AnalysisPanel analysis={analysis} busy={solver.busy} colors={puzzleColors} hasGuesses />
       )}
 
       {result && puzzle?.secret && (
