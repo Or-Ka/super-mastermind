@@ -7,6 +7,8 @@
 import { app, BrowserWindow, Menu, shell } from 'electron';
 import * as path from 'path';
 
+const APP_ICON_PATH = path.join(__dirname, '..', 'build', 'Super-Mastermind.ico');
+
 function createWindow(): void {
   const win = new BrowserWindow({
     width: 1180,
@@ -14,6 +16,7 @@ function createWindow(): void {
     minWidth: 420,
     minHeight: 560,
     title: 'בול פגיעה — Super Mastermind',
+    icon: APP_ICON_PATH,
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -43,6 +46,8 @@ const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   app.quit();
 } else {
+  app.setAppUserModelId('com.orKa.super-mastermind');
+
   app.on('second-instance', () => {
     const [win] = BrowserWindow.getAllWindows();
     if (win) {
