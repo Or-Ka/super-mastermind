@@ -1,7 +1,7 @@
 {
   "name": "super-mastermind",
   "productName": "Super Mastermind",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "משחק בול פגיעה (Mastermind) מלא בעברית - אפליקציית Desktop",
   "private": true,
   "main": "dist-electron/main.js",
@@ -51,9 +51,11 @@
     },
     "files": [
       "dist/**/*",
-      "dist-electron/**/*"
+      "dist-electron/**/*",
+      "build/**/*"
     ],
     "win": {
+      "icon": "build/Super-Mastermind.ico",
       "target": [
         {
           "target": "portable",
@@ -70,6 +72,8 @@
       ]
     },
     "nsis": {
+      "installerIcon": "build/Super-Mastermind.ico",
+      "uninstallerIcon": "build/Super-Mastermind.ico",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true
