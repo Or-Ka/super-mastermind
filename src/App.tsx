@@ -9,6 +9,7 @@ import { ManualScreen } from './screens/ManualScreen';
 import { StatsScreen } from './screens/StatsScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
 import { InstructionsModal } from './screens/InstructionsModal';
+import { DevStamp } from './components/DevStamp';
 
 type ScreenId = 'game' | 'settings' | 'decisive' | 'manual' | 'stats' | 'history';
 
@@ -85,6 +86,7 @@ export default function App() {
       </main>
 
       {showInstructions && <InstructionsModal onClose={() => setShowInstructions(false)} />}
+      <DevStamp />
     </div>
   );
 }
