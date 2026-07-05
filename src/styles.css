@@ -293,8 +293,8 @@ body {
 .board__pegs,
 .slots {
   display: grid;
-  grid-template-columns: repeat(var(--code-length), var(--board-peg-size));
-  gap: var(--board-peg-gap);
+  grid-template-columns: repeat(var(--code-length, 4), var(--board-peg-size, var(--peg-lg)));
+  gap: var(--board-peg-gap, 0.45rem);
   align-items: center;
 }
 .board__actions { display: flex; gap: 0.4rem; margin-inline-start: auto; flex-wrap: wrap; }
@@ -344,13 +344,6 @@ body {
 .analysis__line--muted { color: var(--text-muted); font-size: 0.8rem; }
 .analysis__facts { margin: 0.3rem 0; padding-inline-start: 1.2rem; font-size: 0.85rem; }
 .analysis__facts li { margin-block: 0.25rem; }
-.analysis__why {
-  margin: 0.2rem 0 0.45rem;
-  color: var(--text-muted);
-  font-size: 0.78rem;
-  line-height: 1.45;
-}
-
 /* ---------- אזורים מתקפלים ---------- */
 
 .collapsible { margin-top: 0.6rem; border-top: 1px solid var(--border); padding-top: 0.5rem; }
