@@ -4,7 +4,8 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   base: './',
-  server: { port: 5173, strictPort: true },
+  // PORT מגיע מסביבת ההרצה (כלי preview); ברירת המחדל 5173 עבור dev של Electron.
+  server: { port: Number(process.env.PORT) || 5173, strictPort: true },
   build: { outDir: 'dist' },
   test: {
     environment: 'node',

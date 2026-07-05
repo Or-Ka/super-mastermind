@@ -43,8 +43,12 @@ function buildFacts(
     const colorsInSol = new Set(sol);
     for (let i = 0; i < sol.length; i++) perPosition[i].add(sol[i]);
     for (const c of colorsInSol) everAppear.add(c);
-    if (mustAppear === null) mustAppear = colorsInSol;
-    else mustAppear = new Set([...mustAppear].filter((c) => colorsInSol.has(c)));
+    if (mustAppear === null) {
+      mustAppear = colorsInSol;
+    } else {
+      const previous: ColorId[] = [...mustAppear];
+      mustAppear = new Set(previous.filter((c) => colorsInSol.has(c)));
+    }
   }
 
   const fixedPositions: { position: number; colorId: ColorId }[] = [];
