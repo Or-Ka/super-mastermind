@@ -20,7 +20,9 @@ import type { SolverResponse } from '../workers/solver.worker';
  */
 export function useSolverWorker() {
   const workerRef = useRef<Worker | null>(null);
-  const pendingRef = useRef(new Map<number, { resolve: (v: unknown) => void; reject: (e: Error) => void }>());
+  const pendingRef = useRef(
+    new Map<number, { worker: Worker; resolve: (v: unknown) => void; reject: (e: Error) => void }>(),
+  );
   const idRef = useRef(0);
   const [busyCount, setBusyCount] = useState(0);
 
@@ -31,7 +33,7 @@ export function useSolverWorker() {
     worker.onmessage = (event: MessageEvent<SolverResponse>) => {
       const { id } = event.data;
       const pending = pendingRef.current.get(id);
-      if (!pending) return;
+      if (!pending || pending.worker !== worker) return;
       pendingRef.current.delete(id);
       setBusyCount((n) => Math.max(0, n - 1));
       if (event.data.ok) pending.resolve(event.data.result);
@@ -40,8 +42,16 @@ export function useSolverWorker() {
     workerRef.current = worker;
     const pendingAtSetup = pendingRef.current;
     return () => {
+      let cancelled = 0;
+      for (const [id, pending] of pendingAtSetup) {
+        if (pending.worker !== worker) continue;
+        pendingAtSetup.delete(id);
+        pending.reject(new Error('Worker stopped before completing the request'));
+        cancelled += 1;
+      }
+      if (cancelled > 0) setBusyCount((n) => Math.max(0, n - cancelled));
+      if (workerRef.current === worker) workerRef.current = null;
       worker.terminate();
-      pendingAtSetup.clear();
     };
   }, []);
 
@@ -51,7 +61,7 @@ export function useSolverWorker() {
     const id = ++idRef.current;
     setBusyCount((n) => n + 1);
     return new Promise<T>((resolve, reject) => {
-      pendingRef.current.set(id, { resolve: resolve as (v: unknown) => void, reject });
+      pendingRef.current.set(id, { worker, resolve: resolve as (v: unknown) => void, reject });
       worker.postMessage({ id, ...payload });
     });
   }, []);

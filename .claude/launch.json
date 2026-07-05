@@ -5,7 +5,14 @@
       "name": "vite-dev",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev:vite"],
-      "port": 5173,
+      "port": 5174,
+      "autoPort": true
+    },
+    {
+      "name": "vite-clean",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:vite"],
+      "port": 5174,
       "autoPort": true
     }
   ]
