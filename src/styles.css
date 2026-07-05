@@ -19,6 +19,7 @@
   --success: #4caf78;
   --peg-empty: #2c3048;
   --shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  --peg-lg: 2.9rem;
 }
 
 :root[data-theme='light'] {
@@ -165,12 +166,25 @@ body {
 
 .peg--sm { width: 1.5rem; height: 1.5rem; font-size: 0.7rem; }
 .peg--md { width: 2.2rem; height: 2.2rem; font-size: 1rem; }
-.peg--lg { width: 2.9rem; height: 2.9rem; font-size: 1.3rem; }
+.peg--lg { width: var(--peg-lg); height: var(--peg-lg); font-size: 1.3rem; }
 
 .peg--empty { background: var(--peg-empty); }
 .peg--clickable { cursor: pointer; transition: transform 0.12s, box-shadow 0.12s; }
 .peg--clickable:hover { transform: scale(1.08); box-shadow: 0 0 0 3px var(--accent); }
 .peg--selected { box-shadow: 0 0 0 3px var(--accent-strong); }
+.peg--marked {
+  filter: brightness(0.42) saturate(0.65);
+  box-shadow: inset 0 0 0 999px rgba(0, 0, 0, 0.34), 0 0 0 3px #050506;
+}
+.peg--marked::after {
+  content: '';
+  position: absolute;
+  width: 72%;
+  height: 2px;
+  background: #050506;
+  transform: rotate(-38deg);
+  border-radius: 999px;
+}
 
 .peg__shortcut {
   position: absolute;
@@ -210,6 +224,7 @@ body {
 }
 
 .palette__item--disabled { opacity: 0.35; }
+.palette__item--marked { opacity: 1; }
 .palette__name { font-size: 0.75rem; color: var(--text-muted); }
 
 /* ---------- לוח המשחק ---------- */
@@ -248,20 +263,22 @@ body {
 .status-bar__time { font-variant-numeric: tabular-nums; }
 
 .board {
+  --board-peg-size: var(--peg-lg);
+  --board-peg-gap: 0.45rem;
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
 }
 
 .board__row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1.6rem max-content minmax(7rem, 1fr);
   align-items: center;
   gap: 0.8rem;
   padding: 0.45rem 0.7rem;
   background: var(--bg-raised);
   border: 1px solid var(--border);
   border-radius: 10px;
-  flex-wrap: wrap;
 }
 
 .board__row--current { border-color: var(--accent); box-shadow: var(--shadow); }
@@ -273,10 +290,15 @@ body {
   font-size: 0.85rem;
 }
 
-.board__pegs { display: flex; gap: 0.45rem; align-items: center; }
+.board__pegs,
+.slots {
+  display: grid;
+  grid-template-columns: repeat(var(--code-length), var(--board-peg-size));
+  gap: var(--board-peg-gap);
+  align-items: center;
+}
 .board__actions { display: flex; gap: 0.4rem; margin-inline-start: auto; flex-wrap: wrap; }
 
-.slots { display: flex; gap: 0.45rem; }
 .slot { display: inline-flex; border-radius: 50%; }
 .slot--selected .peg { box-shadow: 0 0 0 3px var(--accent-strong); }
 
@@ -322,6 +344,12 @@ body {
 .analysis__line--muted { color: var(--text-muted); font-size: 0.8rem; }
 .analysis__facts { margin: 0.3rem 0; padding-inline-start: 1.2rem; font-size: 0.85rem; }
 .analysis__facts li { margin-block: 0.25rem; }
+.analysis__why {
+  margin: 0.2rem 0 0.45rem;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
 
 /* ---------- אזורים מתקפלים ---------- */
 
@@ -726,7 +754,8 @@ body {
 
 @media (max-width: 560px) {
   .app-main { padding: 0.7rem; }
-  .peg--lg { width: 2.4rem; height: 2.4rem; }
+  :root { --peg-lg: 2.4rem; }
+  .board__row { grid-template-columns: 1.4rem max-content minmax(0, 1fr); gap: 0.5rem; }
   .board__actions { margin-inline-start: 0; width: 100%; }
   .score__text { display: none; }
 }

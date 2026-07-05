@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { AppSettings, ColorId, GameHistoryEntry, GuessRecord, Hint, AnalysisResult } from '../types';
 import { createGameEngine, type GameEngine, type GameStatus } from '../game-engine/engine';
 import { useSolverWorker } from '../hooks/useSolverWorker';
@@ -37,6 +37,7 @@ export function GameScreen({ settings, onOpenSettings, onOpenInstructions }: Gam
   const [hints, setHints] = useState<Hint[]>([]);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
+  const [markedColorIds, setMarkedColorIds] = useState<Set<ColorId>>(() => new Set());
   const [confirmNewGame, setConfirmNewGame] = useState(false);
   const [showEndModal, setShowEndModal] = useState(false);
   const [revealedSecret, setRevealedSecret] = useState<ColorId[] | null>(null);
@@ -70,6 +71,7 @@ export function GameScreen({ settings, onOpenSettings, onOpenInstructions }: Gam
     setHints([]);
     setAnalysis(null);
     setRecommendation(null);
+    setMarkedColorIds(new Set());
     setShowEndModal(false);
     setRevealedSecret(null);
     setFinalScore(0);
@@ -161,6 +163,7 @@ export function GameScreen({ settings, onOpenSettings, onOpenInstructions }: Gam
   const placeColor = useCallback(
     (colorId: ColorId) => {
       if (status !== 'playing') return;
+      if (markedColorIds.has(colorId)) return;
       setError(null);
       setSlots((prev) => {
         const next = [...prev];
@@ -174,8 +177,18 @@ export function GameScreen({ settings, onOpenSettings, onOpenInstructions }: Gam
       });
       if (settings.display.sounds) sounds.place();
     },
-    [status, selectedSlot, settings.display.sounds],
+    [status, selectedSlot, settings.display.sounds, markedColorIds],
   );
+
+  const togglePaletteMark = useCallback((colorId: ColorId) => {
+    if (status !== 'playing') return;
+    setMarkedColorIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(colorId)) next.delete(colorId);
+      else next.add(colorId);
+      return next;
+    });
+  }, [status]);
 
   const clearSlot = useCallback((index: number) => {
     setSlots((prev) => {
@@ -208,6 +221,7 @@ export function GameScreen({ settings, onOpenSettings, onOpenInstructions }: Gam
     setSelectedSlot(0);
     setError(null);
     setRecommendation(null);
+    setMarkedColorIds(new Set());
     const newStatus = result.status ?? 'playing';
     setStatus(newStatus);
     if (newStatus !== 'playing') finishGame(newStatus, newHistory);
@@ -316,13 +330,13 @@ export function GameScreen({ settings, onOpenSettings, onOpenInstructions }: Gam
           </div>
         )}
 
-        <div className="board">
+        <div className="board" style={{ '--code-length': gameRules.codeLength } as CSSProperties}>
           {history.map((record, index) => (
             <div key={index} className="board__row">
               <span className="board__index">{index + 1}</span>
               <div className="board__pegs">
                 {record.guess.map((id, i) => (
-                  <ColorPeg key={i} color={colorOf(id)} size="md" showSymbol={settings.display.showSymbols} />
+                  <ColorPeg key={i} color={colorOf(id)} size="lg" showSymbol={settings.display.showSymbols} />
                 ))}
               </div>
               <ScorePegs score={record.score} codeLength={gameRules.codeLength} />
@@ -368,6 +382,8 @@ export function GameScreen({ settings, onOpenSettings, onOpenInstructions }: Gam
               showSymbols={settings.display.showSymbols || settings.display.colorBlindMode}
               showNames={settings.display.showColorNames}
               disabledColorIds={disabledColorIds}
+              markedColorIds={markedColorIds}
+              onToggleMark={togglePaletteMark}
             />
             <div className="helper-row">
               {gameRules.hintsEnabled && (
@@ -404,7 +420,13 @@ export function GameScreen({ settings, onOpenSettings, onOpenInstructions }: Gam
       </section>
 
       {gameRules.showAnalysis && (
-        <AnalysisPanel analysis={analysis} busy={solver.busy} colors={settings.colors} hasGuesses={history.length > 0} />
+        <AnalysisPanel
+          analysis={analysis}
+          busy={solver.busy}
+          colors={settings.colors}
+          hasGuesses={history.length > 0}
+          history={history}
+        />
       )}
 
       {confirmNewGame && (
