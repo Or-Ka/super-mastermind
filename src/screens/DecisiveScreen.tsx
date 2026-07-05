@@ -286,7 +286,7 @@ export function DecisiveScreen({ settings }: DecisiveScreenProps) {
       </section>
 
       {showAnalysis && puzzle && (
-        <AnalysisPanel analysis={analysis} busy={solver.busy} colors={puzzleColors} hasGuesses />
+        <AnalysisPanel analysis={analysis} busy={solver.busy} colors={puzzleColors} hasGuesses history={puzzle?.history ?? []} />
       )}
 
       {result && puzzle?.secret && (
