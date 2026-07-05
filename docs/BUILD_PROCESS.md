@@ -103,6 +103,54 @@
 
 שכבת הלוגיקה שלמה ואינה תלויה ב־React כלל.
 
-### המשך
+---
 
-בניית ממשק המשתמש (מסך משחק, הגדרות, ניתוח, מצבי חידה).
+## שלב 4 — ממשק המשתמש המלא (2026-07-05)
+
+### מטרה
+
+כל מסכי האפליקציה בעברית מלאה וב־RTL, נגישים, בלי לוגיקה מתמטית ברכיבים.
+
+### מה בוצע
+
+- רכיבים: `ColorPeg`, `PaletteBar`, `GuessSlots`, `ScorePegs` (ציון גרפי+טקסט),
+  `AnalysisPanel`, `Modal`/`ConfirmDialog`, `Collapsible`.
+- מסכים: `GameScreen`, `SettingsScreen`, `DecisiveScreen`, `ManualScreen`,
+  `StatsScreen`, `HistoryScreen` (כולל שחזור מהלך), `InstructionsModal`.
+- `App.tsx` — ניווט, החלת ערכת נושא/גודל/אנימציות/צלילים; `styles.css` עם
+  משתני עיצוב לשתי ערכות נושא.
+- `electron/main.ts` — חלון יחיד, contextIsolation+sandbox, ללא תפריט וללא IPC.
+- קיצורי מקלדת מלאים ואישורי פעולה הרסנית (משחק חדש, מחיקות, איפוסים).
+
+### בעיות שהתגלו ופתרונן
+
+1. **קונפליקט טיפוסים vite 6 ↔ vitest 2** (ה־vite הפנימי של vitest ישן) —
+   נפתר בשדרוג ל־vitest 3.
+2. **חוקי react-hooks החדשים (purity/refs/set-state-in-effect)** תפסו 6 בעיות
+   אמיתיות: `Date.now()` ב־render, גישת ref ב־render, setState סינכרוני באפקטים —
+   כולן תוקנו (משך סופי נשמר ב־state, אכיפת טיימר עברה ל־callback של interval).
+3. **לולאת רינדור אינסופית** (נתפסה בבדיקה ידנית בדפדפן): אפקטים נתלו באובייקט
+   `solver` שמתחדש בכל רינדור בגלל `busy`. תוקן — תלות בפונקציות היציבות בלבד.
+   הלקח תועד ב־ARCHITECTURE.md.
+
+### בדיקות
+
+- typecheck / lint / build — נקיים; 69 בדיקות עוברות.
+- אימות ידני בדפדפן מול שרת Vite: משחק מלא, ניתוח מתעדכן (288 רצפים, 83% צמצום),
+  מצב „ניחוש מכריע” מייצר חידה תקינה. ראו טבלת הבדיקות ב־TESTING.md.
+
+---
+
+## שלב 5 — אריזה ל־Windows ותיעוד סופי (2026-07-05)
+
+### מה בוצע
+
+- `npm run dist:win` — הופקו `Super Mastermind 1.0.0.exe` (portable, ~71MB)
+  ו־`Super Mastermind Setup 1.0.0.exe` (NSIS) תחת `release/`.
+- בדיקת עשן לגרסה הארוזה: האפליקציה עולה עם כותרת עברית תקינה ונסגרת נקי.
+- הושלמו ARCHITECTURE.md, TESTING.md, KNOWN_LIMITATIONS.md, PROJECT_STATUS.md,
+  README.md.
+
+### תוצאה
+
+הפרויקט עומד בכל קריטריוני הקבלה. מצב עדכני ב־PROJECT_STATUS.md.
